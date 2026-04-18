@@ -1,0 +1,22 @@
+# Gradle
+.gradle/
+build/
+**/build/
+local.properties
+
+# Android Studio / IntelliJ
+.idea/
+*.iml
+captures/
+
+# Kotlin
+*.class
+*.kotlin_module
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Keystore (never commit real keys)
+*.jks
+*.keystore
