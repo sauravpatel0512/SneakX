@@ -1,8 +1,10 @@
 package com.team3.sneakx.ui
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
@@ -20,6 +22,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -44,7 +49,7 @@ import com.team3.sneakx.ui.profile.ProfileScreen
 import com.team3.sneakx.ui.seller.ListingEditScreen
 import com.team3.sneakx.ui.components.SneakBottomNav
 import com.team3.sneakx.ui.components.SneakNavItem
-import com.team3.sneakx.ui.components.SneakStartupLoading
+import com.team3.sneakx.R
 import com.team3.sneakx.ui.seller.MyListingsScreen
 import kotlinx.coroutines.flow.first
 
@@ -71,7 +76,12 @@ fun SneakRoot() {
 
     if (!startReady || startRoute == null) {
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            SneakStartupLoading()
+            Image(
+                painter = painterResource(R.drawable.sneakx_logo),
+                contentDescription = null,
+                modifier = Modifier.width(160.dp),
+                contentScale = ContentScale.Fit,
+            )
         }
         return
     }
