@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -21,24 +22,21 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.outlined.AddPhotoAlternate
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -54,11 +52,14 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.team3.sneakx.LocalAppContainer
 import com.team3.sneakx.data.local.Categories
+import com.team3.sneakx.ui.components.SneakConditionToggle
 import com.team3.sneakx.ui.components.SneakErrorBanner
+import com.team3.sneakx.ui.components.SneakPrimaryButton
 import com.team3.sneakx.ui.components.SneakPrimaryButtonContent
 import com.team3.sneakx.ui.components.SneakSectionLabel
+import com.team3.sneakx.ui.components.SneakTopBarBack
 import com.team3.sneakx.ui.components.sneakOutlinedTextFieldColors
-import com.team3.sneakx.ui.components.sneakTopAppBarColors
+import com.team3.sneakx.ui.theme.SneakFieldShape
 import com.team3.sneakx.ui.theme.SneakSpacing
 import com.team3.sneakx.util.ListingImage
 import com.team3.sneakx.util.copyContentUriToAppFiles
@@ -98,17 +99,7 @@ fun ListingEditScreen(
     }
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(if (existingId == null) "New listing" else "Edit listing") },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-                    }
-                },
-                colors = sneakTopAppBarColors(),
-            )
-        },
+        containerColor = MaterialTheme.colorScheme.background,
     ) { padding ->
         Column(
             Modifier
@@ -116,8 +107,15 @@ fun ListingEditScreen(
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = SneakSpacing.screenPadding)
-                .padding(top = SneakSpacing.md, bottom = SneakSpacing.xl),
+                .padding(top = SneakSpacing.screenTop, bottom = SneakSpacing.xl),
         ) {
+            SneakTopBarBack(
+                eyebrow = if (existingId == null) "New listing" else "Edit listing",
+                title = if (existingId == null) "Sell your pair" else "Your listing",
+                onBack = { navController.popBackStack() },
+                modifier = Modifier.fillMaxWidth(),
+            )
+            Spacer(Modifier.height(SneakSpacing.sectionGap))
             Column(
                 modifier = Modifier
                     .widthIn(max = 520.dp)
@@ -138,7 +136,7 @@ fun ListingEditScreen(
                         label = { Text("Title") },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
-                        shape = MaterialTheme.shapes.medium,
+                        shape = SneakFieldShape,
                         colors = sneakOutlinedTextFieldColors(),
                     )
                     OutlinedTextField(
@@ -146,8 +144,9 @@ fun ListingEditScreen(
                         onValueChange = vm::setDescription,
                         label = { Text("Description") },
                         modifier = Modifier.fillMaxWidth(),
-                        minLines = 3,
-                        shape = MaterialTheme.shapes.medium,
+                        minLines = 4,
+                        maxLines = 8,
+                        shape = SneakFieldShape,
                         colors = sneakOutlinedTextFieldColors(),
                     )
                 }
@@ -158,6 +157,7 @@ fun ListingEditScreen(
                         expanded = catExpanded,
                         onExpandedChange = { catExpanded = it },
                     ) {
+                        val exposedMenuBoxScope = this
                         OutlinedTextField(
                             value = ui.category,
                             onValueChange = {},
@@ -165,12 +165,15 @@ fun ListingEditScreen(
                             label = { Text("Category") },
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = catExpanded) },
                             modifier = Modifier.menuAnchor().fillMaxWidth(),
-                            shape = MaterialTheme.shapes.medium,
+                            shape = SneakFieldShape,
                             colors = sneakOutlinedTextFieldColors(),
                         )
-                        ExposedDropdownMenu(
+                        DropdownMenu(
                             expanded = catExpanded,
                             onDismissRequest = { catExpanded = false },
+                            modifier = with(exposedMenuBoxScope) {
+                                Modifier.exposedDropdownSize()
+                            },
                         ) {
                             Categories.all.forEach { c ->
                                 DropdownMenuItem(
@@ -189,16 +192,17 @@ fun ListingEditScreen(
                         label = { Text("Price") },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
-                        shape = MaterialTheme.shapes.medium,
+                        shape = SneakFieldShape,
                         colors = sneakOutlinedTextFieldColors(),
+                        suffix = { Text("USD", style = MaterialTheme.typography.bodyMedium) },
                     )
-                    OutlinedTextField(
-                        value = ui.condition,
-                        onValueChange = vm::setCondition,
-                        label = { Text("Condition (e.g. New, Used)") },
+                    SneakSectionLabel("Condition")
+                    Spacer(Modifier.height(SneakSpacing.sm))
+                    SneakConditionToggle(
+                        selected = ui.condition.ifBlank { "New" },
+                        options = listOf("New", "Used"),
+                        onSelect = vm::setCondition,
                         modifier = Modifier.fillMaxWidth(),
-                        shape = MaterialTheme.shapes.medium,
-                        colors = sneakOutlinedTextFieldColors(),
                     )
                 }
 
@@ -276,24 +280,17 @@ fun ListingEditScreen(
                     Column(
                         modifier = Modifier.padding(SneakSpacing.lg),
                     ) {
-                        Button(
+                        SneakPrimaryButton(
                             onClick = {
                                 vm.save { navController.popBackStack() }
                             },
                             enabled = !ui.loading,
                             modifier = Modifier.fillMaxWidth(),
-                            shape = MaterialTheme.shapes.large,
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.primary,
-                                contentColor = MaterialTheme.colorScheme.onPrimary,
-                                disabledContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
-                                disabledContentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
-                            ),
                         ) {
                             SneakPrimaryButtonContent(
                                 loading = ui.loading,
                                 loadingText = "Saving…",
-                                idleText = "Save",
+                                idleText = if (existingId == null) "Publish listing" else "Save",
                             )
                         }
                     }

@@ -14,7 +14,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -38,8 +37,10 @@ import com.team3.sneakx.LocalAppContainer
 import com.team3.sneakx.domain.Role
 import com.team3.sneakx.ui.SneakViewModelFactory
 import com.team3.sneakx.ui.components.SneakErrorBanner
+import com.team3.sneakx.ui.components.SneakPrimaryButton
 import com.team3.sneakx.ui.components.SneakPrimaryButtonContent
 import com.team3.sneakx.ui.components.sneakOutlinedTextFieldColors
+import com.team3.sneakx.ui.theme.SneakFieldShape
 import com.team3.sneakx.ui.theme.SneakSpacing
 
 @Composable
@@ -69,8 +70,8 @@ fun RegisterScreen(
                 .fillMaxWidth(),
         ) {
             Text(
-                text = "Register",
-                style = MaterialTheme.typography.headlineLarge,
+                text = "Join SneakX.",
+                style = MaterialTheme.typography.headlineMedium,
                 color = MaterialTheme.colorScheme.onBackground,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth(),
@@ -101,7 +102,7 @@ fun RegisterScreen(
                         label = { Text("Name") },
                         singleLine = true,
                         isError = hasError,
-                        shape = MaterialTheme.shapes.medium,
+                        shape = SneakFieldShape,
                         colors = sneakOutlinedTextFieldColors(),
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Text,
@@ -115,7 +116,7 @@ fun RegisterScreen(
                         label = { Text("Email") },
                         singleLine = true,
                         isError = hasError,
-                        shape = MaterialTheme.shapes.medium,
+                        shape = SneakFieldShape,
                         colors = sneakOutlinedTextFieldColors(),
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Email,
@@ -130,7 +131,7 @@ fun RegisterScreen(
                         singleLine = true,
                         isError = hasError,
                         visualTransformation = PasswordVisualTransformation(),
-                        shape = MaterialTheme.shapes.medium,
+                        shape = SneakFieldShape,
                         colors = sneakOutlinedTextFieldColors(),
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Password,
@@ -156,16 +157,15 @@ fun RegisterScreen(
 
                     ui.error?.let { msg -> SneakErrorBanner(message = msg) }
 
-                    Button(
+                    SneakPrimaryButton(
                         onClick = { vm.register(onRegistered) },
                         enabled = !ui.loading,
                         modifier = Modifier.fillMaxWidth(),
-                        shape = MaterialTheme.shapes.large,
                     ) {
                         SneakPrimaryButtonContent(
                             loading = ui.loading,
                             loadingText = "Creating…",
-                            idleText = "Register",
+                            idleText = "Create account",
                         )
                     }
                 }

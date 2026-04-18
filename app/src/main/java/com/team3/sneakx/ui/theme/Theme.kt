@@ -10,6 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
@@ -17,9 +18,8 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import com.team3.sneakx.data.session.ThemeMode
 
 /**
- * Root theme for SneakX: [SneakLightColorScheme] / [SneakDarkColorScheme] (premium violet on neutral
- * surfaces), [Typography], and [SneakShapes]. Use [MaterialTheme.colorScheme], [MaterialTheme.typography],
- * and [MaterialTheme.shapes] in composables. For layout rhythm, prefer [SneakSpacing] over ad hoc dp.
+ * Root theme for SneakX: [SneakLightColorScheme] / [SneakDarkColorScheme], [Typography], [SneakShapes].
+ * Extended colors: [LocalSneakExtendedColors]. Use [MaterialTheme] + [SneakSpacing] for layout rhythm.
  *
  * By default **static brand colors** are used on all API levels so the marketplace looks consistent.
  * Set [useDynamicColor] to `true` on API 31+ to use the device’s Material You dynamic palette (wallpaper-based);
@@ -44,12 +44,16 @@ fun SneakXTheme(
         dark -> SneakDarkColorScheme
         else -> SneakLightColorScheme
     }
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = Typography,
-        shapes = SneakShapes,
-        content = content,
-    )
+    CompositionLocalProvider(
+        LocalSneakExtendedColors provides SneakExtendedColors(success = SneakSuccess),
+    ) {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            typography = Typography,
+            shapes = SneakShapes,
+            content = content,
+        )
+    }
 }
 
 @Preview(name = "Light", showBackground = true)

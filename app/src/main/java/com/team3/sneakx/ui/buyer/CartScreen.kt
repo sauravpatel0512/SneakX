@@ -1,5 +1,6 @@
 package com.team3.sneakx.ui.buyer
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -9,21 +10,19 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.outlined.ShoppingCart
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -35,9 +34,11 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.team3.sneakx.LocalAppContainer
+import com.team3.sneakx.ui.components.SneakCartSummaryCard
 import com.team3.sneakx.ui.components.SneakEmptyState
-import com.team3.sneakx.ui.components.SneakScreenTitle
+import com.team3.sneakx.ui.components.SneakTopBarBack
 import com.team3.sneakx.ui.theme.SneakSpacing
+import com.team3.sneakx.ui.theme.priceTextStyle
 import com.team3.sneakx.util.ListingImage
 import com.team3.sneakx.util.photosFromJson
 import kotlin.math.round
@@ -60,15 +61,29 @@ fun CartScreen(
     )
     val lines by vm.lines.collectAsState()
     val subtotal = round(lines.sumOf { it.lineTotal } * 100.0) / 100.0
+    val subtotalStr = "$${String.format("%.2f", subtotal)}"
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = SneakSpacing.screenPadding)
-            .padding(top = SneakSpacing.lg, bottom = SneakSpacing.sm),
+            .padding(top = SneakSpacing.screenTop),
     ) {
-        SneakScreenTitle("Cart", Modifier.fillMaxWidth())
-        Spacer(Modifier.height(SneakSpacing.md))
+        SneakTopBarBack(
+            eyebrow = "Bag",
+            title = "Your cart",
+            onBack = { navController.popBackStack() },
+            trailing = {
+                Text(
+                    "${lines.size} items",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            },
+            modifier = Modifier.fillMaxWidth(),
+        )
+        Spacer(Modifier.height(SneakSpacing.sectionGap))
+
         if (lines.isEmpty()) {
             SneakEmptyState(
                 title = "Your cart is empty.",
@@ -78,93 +93,85 @@ fun CartScreen(
         } else {
             LazyColumn(
                 modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(SneakSpacing.sm),
-                contentPadding = PaddingValues(bottom = SneakSpacing.bottomContentInset),
+                verticalArrangement = Arrangement.spacedBy(SneakSpacing.listItemGap),
+                contentPadding = PaddingValues(bottom = SneakSpacing.md),
             ) {
                 items(lines, key = { it.listing.id }) { line ->
                     val photos = photosFromJson(line.listing.photosJson)
-                    Card(
+                    Surface(
                         modifier = Modifier.fillMaxWidth(),
-                        shape = MaterialTheme.shapes.large,
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-                        ),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+                        shape = RoundedCornerShape(20.dp),
+                        color = MaterialTheme.colorScheme.surface,
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+                        shadowElevation = 0.dp,
                     ) {
-                        Column(Modifier.padding(SneakSpacing.md)) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(SneakSpacing.sm),
-                            ) {
-                                ListingImage(
-                                    photoUri = photos.firstOrNull(),
-                                    modifier = Modifier
-                                        .height(72.dp)
-                                        .weight(0.28f)
-                                        .clip(MaterialTheme.shapes.small),
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(SneakSpacing.cardPadding),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(SneakSpacing.md),
+                        ) {
+                            ListingImage(
+                                photoUri = photos.firstOrNull(),
+                                modifier = Modifier
+                                    .size(80.dp)
+                                    .clip(RoundedCornerShape(16.dp)),
+                            )
+                            Column(Modifier.weight(1f)) {
+                                Text(
+                                    line.listing.category.uppercase(),
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
-                                Column(Modifier.weight(0.5f)) {
-                                    Text(
-                                        line.listing.title,
-                                        style = MaterialTheme.typography.titleMedium,
-                                        color = MaterialTheme.colorScheme.onSurface,
-                                    )
-                                    Text(
-                                        "$${String.format("%.2f", line.listing.price)} each",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    )
+                                Text(
+                                    line.listing.title,
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                )
+                                Text(
+                                    "${line.listing.category} · ${line.listing.condition}",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                                Text(
+                                    "$${String.format("%.2f", line.lineTotal)}",
+                                    style = priceTextStyle(),
+                                    modifier = Modifier.padding(top = SneakSpacing.xs),
+                                )
+                            }
+                            Column(horizontalAlignment = Alignment.End) {
+                                IconButton(onClick = { vm.remove(line.listing.id) }) {
+                                    Icon(Icons.Default.Delete, contentDescription = "Remove")
                                 }
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    IconButton(onClick = { vm.setQty(line.listing.id, line.quantity - 1) }) {
-                                        Icon(Icons.Default.Remove, contentDescription = "Decrease")
-                                    }
-                                    Text(
-                                        "${line.quantity}",
-                                        style = MaterialTheme.typography.titleMedium,
-                                    )
-                                    IconButton(onClick = { vm.setQty(line.listing.id, line.quantity + 1) }) {
-                                        Icon(Icons.Default.Add, contentDescription = "Increase")
-                                    }
-                                    IconButton(onClick = { vm.remove(line.listing.id) }) {
-                                        Icon(Icons.Default.Delete, contentDescription = "Remove")
+                                Surface(
+                                    shape = RoundedCornerShape(20.dp),
+                                    color = MaterialTheme.colorScheme.surfaceVariant,
+                                ) {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        IconButton(onClick = { vm.setQty(line.listing.id, line.quantity - 1) }) {
+                                            Icon(Icons.Default.Remove, contentDescription = "Decrease")
+                                        }
+                                        Text(
+                                            "${line.quantity}",
+                                            style = MaterialTheme.typography.titleMedium,
+                                        )
+                                        IconButton(onClick = { vm.setQty(line.listing.id, line.quantity + 1) }) {
+                                            Icon(Icons.Default.Add, contentDescription = "Increase")
+                                        }
                                     }
                                 }
                             }
-                            HorizontalDivider(
-                                modifier = Modifier.padding(vertical = SneakSpacing.sm),
-                                color = MaterialTheme.colorScheme.outlineVariant,
-                            )
-                            Text(
-                                "Line: $${String.format("%.2f", line.lineTotal)}",
-                                style = MaterialTheme.typography.labelLarge,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
                         }
                     }
                 }
             }
-        }
-        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-        Spacer(Modifier.height(SneakSpacing.md))
-        Text(
-            "Subtotal: $${String.format("%.2f", subtotal)}",
-            style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.primary,
-        )
-        Spacer(Modifier.height(SneakSpacing.md))
-        Button(
-            onClick = { navController.navigate("checkout") },
-            enabled = lines.isNotEmpty(),
-            modifier = Modifier.fillMaxWidth(),
-            shape = MaterialTheme.shapes.large,
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary,
-            ),
-        ) {
-            Text("Checkout")
+            SneakCartSummaryCard(
+                subtotalFormatted = subtotalStr,
+                totalFormatted = subtotalStr,
+                onCheckout = { navController.navigate("checkout") },
+                modifier = Modifier.fillMaxWidth(),
+            )
         }
     }
 }

@@ -13,19 +13,13 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -42,10 +36,15 @@ import com.team3.sneakx.LocalAppContainer
 import com.team3.sneakx.data.session.Session
 import com.team3.sneakx.domain.ListingStatus
 import com.team3.sneakx.domain.Role
-import com.team3.sneakx.ui.components.sneakTopAppBarColors
+import com.team3.sneakx.ui.components.SneakStickyCtaBar
+import com.team3.sneakx.ui.components.SneakTopBarBack
 import com.team3.sneakx.ui.theme.SneakSpacing
+import com.team3.sneakx.ui.theme.priceTextStyle
 import com.team3.sneakx.util.ListingImage
 import com.team3.sneakx.util.photosFromJson
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -80,21 +79,34 @@ fun ListingDetailScreen(
         }
     }
 
+    val buyerId = session.userId
+    val canBuy = listing != null &&
+        session.role == Role.BUYER &&
+        listing!!.status == ListingStatus.ACTIVE.name &&
+        buyerId != null
+
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Listing") },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-                    }
-                },
-                colors = sneakTopAppBarColors(),
-            )
-        },
+        containerColor = MaterialTheme.colorScheme.background,
         snackbarHost = { SnackbarHost(snackbar) },
+        bottomBar = {
+            if (canBuy && buyerId != null) {
+                SneakStickyCtaBar(
+                    primaryLabel = "Add to cart",
+                    onPrimaryClick = { vm.addToCart(buyerId) { } },
+                    enabled = true,
+                )
+            }
+        },
     ) { padding ->
         Column(Modifier.fillMaxSize().padding(padding)) {
+            SneakTopBarBack(
+                eyebrow = "Marketplace",
+                title = "Listing",
+                onBack = { navController.popBackStack() },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = SneakSpacing.screenPadding),
+            )
             val photos = listing?.let { photosFromJson(it.photosJson) } ?: emptyList()
             var mainIndex by remember(listingId) { mutableIntStateOf(0) }
 
@@ -109,7 +121,7 @@ fun ListingDetailScreen(
                             mainIndex.coerceIn(0, (photos.size - 1).coerceAtLeast(0)),
                         ),
                         modifier = Modifier
-                            .height(240.dp)
+                            .height(260.dp)
                             .fillMaxWidth()
                             .padding(horizontal = SneakSpacing.screenPadding)
                             .padding(top = SneakSpacing.sm)
@@ -152,25 +164,33 @@ fun ListingDetailScreen(
                 ) {
                     listing?.let { l ->
                         Text(
+                            l.category.uppercase(),
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                        Text(
                             l.title,
                             style = MaterialTheme.typography.headlineMedium,
                             color = MaterialTheme.colorScheme.onBackground,
                         )
                         Text(
                             "$${String.format("%.2f", l.price)}",
-                            style = MaterialTheme.typography.titleLarge,
-                            color = MaterialTheme.colorScheme.primary,
+                            style = priceTextStyle(MaterialTheme.typography.headlineSmall).copy(
+                                color = MaterialTheme.colorScheme.primary,
+                            ),
                         )
                         Text(
                             "${l.category} · ${l.condition}",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
+                        val fmt = remember { SimpleDateFormat("MMM d, yyyy", Locale.getDefault()) }
+                        Text(
+                            "Posted ${fmt.format(Date(l.createdAtMillis))}",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
 
-                        val buyerId = session.userId
-                        val canBuy = session.role == Role.BUYER &&
-                            l.status == ListingStatus.ACTIVE.name &&
-                            buyerId != null
                         val showStatusOnly = session.role == Role.BUYER &&
                             buyerId != null &&
                             l.status != ListingStatus.ACTIVE.name
@@ -192,7 +212,8 @@ fun ListingDetailScreen(
 
                         Surface(
                             shape = MaterialTheme.shapes.large,
-                            color = MaterialTheme.colorScheme.surfaceContainerLow,
+                            color = MaterialTheme.colorScheme.surface,
+                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
                         ) {
                             Text(
                                 l.description,
@@ -200,20 +221,6 @@ fun ListingDetailScreen(
                                 color = MaterialTheme.colorScheme.onSurface,
                                 modifier = Modifier.padding(SneakSpacing.lg),
                             )
-                        }
-
-                        if (canBuy) {
-                            Button(
-                                onClick = {
-                                    vm.addToCart(buyerId) { }
-                                },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(top = SneakSpacing.sm),
-                                shape = MaterialTheme.shapes.large,
-                            ) {
-                                Text("Add to cart")
-                            }
                         }
                     } ?: Text(
                         "Listing not found",

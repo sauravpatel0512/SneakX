@@ -23,16 +23,18 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.team3.sneakx.ui.theme.SneakSpacing
 
 /** Shared [androidx.compose.material3.TopAppBar] colors for SneakX screens. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun sneakTopAppBarColors() = TopAppBarDefaults.topAppBarColors(
-    containerColor = MaterialTheme.colorScheme.surfaceContainer,
+    containerColor = Color.Transparent,
     titleContentColor = MaterialTheme.colorScheme.onSurface,
 )
 
@@ -118,7 +120,7 @@ fun SneakEmptyState(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = SneakSpacing.xxl),
+            .padding(vertical = SneakSpacing.xxxl),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
@@ -170,9 +172,10 @@ fun SneakSectionLabel(
     modifier: Modifier = Modifier,
 ) {
     Text(
-        text = text,
-        style = MaterialTheme.typography.titleSmall,
+        text = text.uppercase(),
+        style = MaterialTheme.typography.labelMedium,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
+        letterSpacing = 0.8.sp,
         modifier = modifier.fillMaxWidth(),
     )
 }

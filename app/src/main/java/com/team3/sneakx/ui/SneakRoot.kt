@@ -9,12 +9,8 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.outlined.Inventory2
 import androidx.compose.material.icons.outlined.People
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -24,7 +20,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -47,6 +42,8 @@ import com.team3.sneakx.ui.buyer.ListingDetailScreen
 import com.team3.sneakx.ui.buyer.OrderConfirmationScreen
 import com.team3.sneakx.ui.profile.ProfileScreen
 import com.team3.sneakx.ui.seller.ListingEditScreen
+import com.team3.sneakx.ui.components.SneakBottomNav
+import com.team3.sneakx.ui.components.SneakNavItem
 import com.team3.sneakx.ui.components.SneakStartupLoading
 import com.team3.sneakx.ui.seller.MyListingsScreen
 import kotlinx.coroutines.flow.first
@@ -84,6 +81,7 @@ fun SneakRoot() {
     val role = session.role
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
         bottomBar = {
             if (session.userId != null && role != null && showBottomBar(currentRoute)) {
                 BottomBar(navController, role, currentRoute ?: "")
@@ -171,43 +169,35 @@ private fun BottomBar(
     role: Role,
     currentRoute: String
 ) {
-    val items: List<Triple<String, String, ImageVector>> = when (role) {
+    val items: List<SneakNavItem> = when (role) {
         Role.BUYER -> listOf(
-            Triple("browse", "Home", Icons.Default.Home),
-            Triple("cart", "Cart", Icons.Default.ShoppingCart),
-            Triple("profile", "Profile", Icons.Default.Person)
+            SneakNavItem("browse", "Shop", Icons.Default.Home),
+            SneakNavItem("cart", "Cart", Icons.Default.ShoppingCart),
+            SneakNavItem("profile", "Me", Icons.Default.Person)
         )
         Role.SELLER -> listOf(
-            Triple("browse", "Home", Icons.Default.Home),
-            Triple("my_listings", "My listings", Icons.Outlined.Inventory2),
-            Triple("profile", "Profile", Icons.Default.Person)
+            SneakNavItem("browse", "Shop", Icons.Default.Home),
+            SneakNavItem("my_listings", "Sell", Icons.Outlined.Inventory2),
+            SneakNavItem("profile", "Me", Icons.Default.Person)
         )
         Role.ADMIN -> listOf(
-            Triple("browse", "Home", Icons.Default.Home),
-            Triple("admin_users", "Users", Icons.Outlined.People),
-            Triple("admin_listings", "Listings", Icons.Outlined.Inventory2),
-            Triple("profile", "Profile", Icons.Default.Person)
+            SneakNavItem("browse", "Shop", Icons.Default.Home),
+            SneakNavItem("admin_users", "Users", Icons.Outlined.People),
+            SneakNavItem("admin_listings", "Listings", Icons.Outlined.Inventory2),
+            SneakNavItem("profile", "Me", Icons.Default.Person)
         )
     }
-    NavigationBar(
-        containerColor = MaterialTheme.colorScheme.surfaceContainer,
-    ) {
-        items.forEach { (route, label, icon) ->
-            val selected = currentRoute == route
-            NavigationBarItem(
-                selected = selected,
-                onClick = {
-                    navController.navigate(route) {
-                        popUpTo(navController.graph.findStartDestination().id) {
-                            saveState = true
-                        }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
-                },
-                icon = { Icon(icon, contentDescription = label) },
-                label = { Text(label) }
-            )
-        }
-    }
+    SneakBottomNav(
+        items = items,
+        currentRoute = currentRoute,
+        onNavigate = { route ->
+            navController.navigate(route) {
+                popUpTo(navController.graph.findStartDestination().id) {
+                    saveState = true
+                }
+                launchSingleTop = true
+                restoreState = true
+            }
+        },
+    )
 }

@@ -4,28 +4,44 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 /**
- * 4 dp grid for consistent padding and gaps. Prefer these over raw dp literals in new UI.
+ * Spec scale: 4 · 8 · 12 · 16 · 20 · 24 · 32 · 40
  */
 object SneakSpacing {
     val xs: Dp = 4.dp
     val sm: Dp = 8.dp
     val md: Dp = 12.dp
     val lg: Dp = 16.dp
-    val xl: Dp = 24.dp
-    val xxl: Dp = 32.dp
+    val xl: Dp = 20.dp
+    val xxl: Dp = 24.dp
+    val xxxl: Dp = 32.dp
+    val huge: Dp = 40.dp
 
-    /** Standard horizontal padding for full-width screens and scrolling lists. */
-    val screenPadding: Dp = lg
+    /** Horizontal padding for full-width screens */
+    val screenPadding: Dp = 20.dp
 
-    /** Vertical or horizontal gap between list rows or related controls. */
-    val listItemGap: Dp = sm
+    /** Top padding below status bar (content start) */
+    val screenTop: Dp = 28.dp
 
-    /** Inner padding for cards and image tiles. */
-    val cardPadding: Dp = md
+    /** Gap between major sections */
+    val sectionGap: Dp = 24.dp
 
-    /** Space below fixed headers before scrollable content. */
-    val sectionGap: Dp = md
+    /** Inner padding for cards */
+    val cardPadding: Dp = 16.dp
 
-    /** Extra bottom inset for content above nav bars / FABs. */
-    val bottomContentInset: Dp = 88.dp
+    /** Vertical gap between list rows */
+    val listItemGap: Dp = 12.dp
+
+    /** 2-column grid gutter */
+    val gridGutterH: Dp = 12.dp
+    val gridGutterV: Dp = 24.dp
+
+    val controlGap: Dp = 16.dp
+
+    val iconTextGap: Dp = 8.dp
+
+    /** Content above floating bottom nav */
+    val bottomContentInset: Dp = 96.dp
+
+    /** Legacy alias used in some screens */
+    val mdLegacy: Dp = md
 }

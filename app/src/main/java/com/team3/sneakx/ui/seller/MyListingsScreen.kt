@@ -14,8 +14,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Inventory2
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -34,6 +32,7 @@ import com.team3.sneakx.LocalAppContainer
 import com.team3.sneakx.data.local.entity.ListingEntity
 import com.team3.sneakx.ui.components.SneakEmptyState
 import com.team3.sneakx.ui.components.SneakListingCard
+import com.team3.sneakx.ui.components.SneakPrimaryButton
 import com.team3.sneakx.ui.components.SneakScreenTitle
 import com.team3.sneakx.ui.theme.SneakSpacing
 import com.team3.sneakx.util.photosFromJson
@@ -81,7 +80,7 @@ fun MyListingsScreen(
         Modifier
             .fillMaxSize()
             .padding(horizontal = SneakSpacing.screenPadding)
-            .padding(top = SneakSpacing.lg, bottom = SneakSpacing.sm),
+            .padding(top = SneakSpacing.screenTop, bottom = SneakSpacing.sm),
     ) {
         Row(
             Modifier.fillMaxWidth(),
@@ -89,15 +88,8 @@ fun MyListingsScreen(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             SneakScreenTitle("My listings", modifier = Modifier.weight(1f))
-            Button(
-                onClick = { navController.navigate("listing_edit/new") },
-                shape = MaterialTheme.shapes.large,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onPrimary,
-                ),
-            ) {
-                Text("New")
+            SneakPrimaryButton(onClick = { navController.navigate("listing_edit/new") }) {
+                Text("New", style = MaterialTheme.typography.labelLarge)
             }
         }
         Spacer(Modifier.height(SneakSpacing.md))

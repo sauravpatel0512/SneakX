@@ -1,5 +1,7 @@
 package com.team3.sneakx.ui.admin
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -9,6 +11,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -17,10 +21,12 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -28,6 +34,7 @@ import com.team3.sneakx.LocalAppContainer
 import com.team3.sneakx.ui.components.SneakEmptyState
 import com.team3.sneakx.ui.components.SneakListingCard
 import com.team3.sneakx.ui.components.SneakScreenTitle
+import com.team3.sneakx.ui.theme.SneakLime
 import com.team3.sneakx.ui.theme.SneakSpacing
 import com.team3.sneakx.util.photosFromJson
 
@@ -50,9 +57,25 @@ fun AdminListingsScreen(adminUserId: String) {
         Modifier
             .fillMaxSize()
             .padding(horizontal = SneakSpacing.screenPadding)
-            .padding(top = SneakSpacing.lg, bottom = SneakSpacing.sm),
+            .padding(top = SneakSpacing.screenTop, bottom = SneakSpacing.sm),
     ) {
-        SneakScreenTitle("All listings", Modifier.fillMaxWidth())
+        Row(verticalAlignment = Alignment.Bottom) {
+            SneakScreenTitle("Admin", Modifier.weight(1f))
+            Text(
+                "Listings",
+                style = MaterialTheme.typography.labelLarge,
+                color = SneakLime,
+            )
+        }
+        Spacer(Modifier.height(SneakSpacing.sm))
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(SneakSpacing.sm),
+        ) {
+            AdminKpiCard("Listings", listings.size.toString())
+        }
         Spacer(Modifier.height(SneakSpacing.md))
         if (listings.isEmpty()) {
             SneakEmptyState(
@@ -108,6 +131,36 @@ fun AdminListingsScreen(adminUserId: String) {
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun AdminKpiCard(label: String, value: String) {
+    Surface(
+        modifier = Modifier
+            .width(160.dp)
+            .height(100.dp),
+        shape = MaterialTheme.shapes.large,
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+        tonalElevation = 0.dp,
+        shadowElevation = 0.dp,
+    ) {
+        Column(
+            modifier = Modifier.padding(SneakSpacing.cardPadding),
+            verticalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Text(
+                label.uppercase(),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Text(
+                value,
+                style = MaterialTheme.typography.headlineMedium,
+                color = MaterialTheme.colorScheme.onBackground,
+            )
         }
     }
 }

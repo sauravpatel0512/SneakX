@@ -52,7 +52,7 @@ fun AdminUsersScreen(adminUserId: String) {
         Modifier
             .fillMaxSize()
             .padding(horizontal = SneakSpacing.screenPadding)
-            .padding(top = SneakSpacing.lg, bottom = SneakSpacing.sm),
+            .padding(top = SneakSpacing.screenTop, bottom = SneakSpacing.sm),
     ) {
         SneakScreenTitle("Users", Modifier.fillMaxWidth())
         Spacer(Modifier.height(SneakSpacing.md))

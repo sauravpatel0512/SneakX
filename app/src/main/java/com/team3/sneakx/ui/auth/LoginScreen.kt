@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -33,8 +32,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.team3.sneakx.LocalAppContainer
 import com.team3.sneakx.ui.SneakViewModelFactory
 import com.team3.sneakx.ui.components.SneakErrorBanner
+import com.team3.sneakx.ui.components.SneakPrimaryButton
 import com.team3.sneakx.ui.components.SneakPrimaryButtonContent
 import com.team3.sneakx.ui.components.sneakOutlinedTextFieldColors
+import com.team3.sneakx.ui.theme.SneakFieldShape
 import com.team3.sneakx.ui.theme.SneakSpacing
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -68,16 +69,24 @@ fun LoginScreen(
         ) {
         Text(
             text = "SneakX",
-            style = MaterialTheme.typography.headlineLarge,
+            style = MaterialTheme.typography.displaySmall,
             color = MaterialTheme.colorScheme.onBackground,
             textAlign = TextAlign.Center,
         )
-        Spacer(Modifier.height(SneakSpacing.sm))
+        Spacer(Modifier.height(SneakSpacing.md))
         Text(
-            text = "Shoe marketplace",
+            text = "Welcome back.",
+            style = MaterialTheme.typography.headlineMedium,
+            color = MaterialTheme.colorScheme.onBackground,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth(),
+        )
+        Text(
+            text = "Sign in to keep trading on campus.",
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth(),
         )
         Spacer(Modifier.height(SneakSpacing.xl))
 
@@ -100,7 +109,7 @@ fun LoginScreen(
                     label = { Text("Email") },
                     singleLine = true,
                     isError = hasError,
-                    shape = MaterialTheme.shapes.medium,
+                    shape = SneakFieldShape,
                     colors = sneakOutlinedTextFieldColors(),
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Email,
@@ -115,7 +124,7 @@ fun LoginScreen(
                     singleLine = true,
                     isError = hasError,
                     visualTransformation = PasswordVisualTransformation(),
-                    shape = MaterialTheme.shapes.medium,
+                    shape = SneakFieldShape,
                     colors = sneakOutlinedTextFieldColors(),
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Password,
@@ -137,11 +146,10 @@ fun LoginScreen(
                     }
                 }
 
-                Button(
+                SneakPrimaryButton(
                     onClick = { vm.login(onLoggedIn) },
                     enabled = !ui.loading,
                     modifier = Modifier.fillMaxWidth(),
-                    shape = MaterialTheme.shapes.large,
                 ) {
                     SneakPrimaryButtonContent(
                         loading = ui.loading,
