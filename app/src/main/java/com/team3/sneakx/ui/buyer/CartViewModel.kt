@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class CartViewModel(
-    buyerId: String,
+    private val buyerId: String,
     private val cartRepository: CartRepository
 ) : ViewModel() {
     val lines: StateFlow<List<CartLineUi>> = cartRepository.observeCartLines(buyerId)

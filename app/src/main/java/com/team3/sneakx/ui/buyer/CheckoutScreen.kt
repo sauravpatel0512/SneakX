@@ -1,25 +1,30 @@
 package com.team3.sneakx.ui.buyer
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.weight
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -29,12 +34,19 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.team3.sneakx.LocalAppContainer
 import com.team3.sneakx.payment.MockPaymentGateway
+import com.team3.sneakx.ui.components.SneakErrorBanner
+import com.team3.sneakx.ui.components.SneakPrimaryButtonContent
+import com.team3.sneakx.ui.components.sneakOutlinedTextFieldColors
+import com.team3.sneakx.ui.components.SneakSectionLabel
+import com.team3.sneakx.ui.components.sneakTopAppBarColors
+import com.team3.sneakx.ui.theme.SneakSpacing
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -71,64 +83,94 @@ fun CheckoutScreen(
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
-                }
+                },
+                colors = sneakTopAppBarColors(),
             )
-        }
+        },
     ) { padding ->
         Column(
             Modifier
                 .fillMaxSize()
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
-                .padding(16.dp)
+                .padding(horizontal = SneakSpacing.screenPadding)
+                .padding(top = SneakSpacing.lg, bottom = SneakSpacing.xl),
+            verticalArrangement = Arrangement.spacedBy(SneakSpacing.md),
         ) {
             OutlinedTextField(
                 value = ui.shipping,
                 onValueChange = vm::setShipping,
                 label = { Text("Shipping address / info") },
                 modifier = Modifier.fillMaxWidth(),
-                minLines = 3
+                minLines = 3,
+                shape = MaterialTheme.shapes.medium,
+                colors = sneakOutlinedTextFieldColors(),
             )
-            Spacer(Modifier.padding(8.dp))
-            Text("Payment method", style = MaterialTheme.typography.labelLarge)
+            SneakSectionLabel("Payment method")
             val methods = listOf("Mock card", "Mock PayPal", "Mock wallet")
-            methods.forEach { m ->
-                Row(
-                    verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
-                ) {
-                    RadioButton(selected = ui.paymentMethod == m, onClick = { vm.setPaymentMethod(m) })
-                    Text(m)
+            Column(Modifier.selectableGroup()) {
+                methods.forEach { m ->
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = SneakSpacing.xs),
+                    ) {
+                        RadioButton(
+                            selected = ui.paymentMethod == m,
+                            onClick = { vm.setPaymentMethod(m) },
+                            colors = RadioButtonDefaults.colors(
+                                selectedColor = MaterialTheme.colorScheme.primary,
+                            ),
+                        )
+                        Text(
+                            m,
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            modifier = Modifier.padding(start = SneakSpacing.sm),
+                        )
+                    }
                 }
             }
-            Spacer(Modifier.padding(8.dp))
             Row(
-                verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth(),
             ) {
-                Text("Simulate payment failure (demo)")
+                Text(
+                    "Simulate payment failure (demo)",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
                 Spacer(Modifier.weight(1f))
                 Switch(
                     checked = simulateFail,
                     onCheckedChange = {
                         simulateFail = it
                         MockPaymentGateway.forceNextFailure = it
-                    }
+                    },
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = MaterialTheme.colorScheme.primary,
+                        checkedTrackColor = MaterialTheme.colorScheme.primaryContainer,
+                    ),
                 )
             }
-            ui.error?.let {
-                Text(it, color = MaterialTheme.colorScheme.error)
-                Spacer(Modifier.padding(4.dp))
-            }
-            ui.paymentFailedMessage?.let {
-                Text(it, color = MaterialTheme.colorScheme.error)
-                Spacer(Modifier.padding(4.dp))
-            }
+            ui.error?.let { SneakErrorBanner(message = it) }
+            ui.paymentFailedMessage?.let { SneakErrorBanner(message = it) }
             Button(
                 onClick = { vm.placeOrder() },
                 enabled = !ui.loading,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                shape = MaterialTheme.shapes.large,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
+                ),
             ) {
-                Text(if (ui.loading) "Processing…" else "Place order")
+                SneakPrimaryButtonContent(
+                    loading = ui.loading,
+                    loadingText = "Processing…",
+                    idleText = "Place order",
+                )
             }
         }
     }

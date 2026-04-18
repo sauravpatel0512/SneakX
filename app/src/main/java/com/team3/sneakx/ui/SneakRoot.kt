@@ -9,8 +9,8 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.outlined.Inventory2
 import androidx.compose.material.icons.outlined.People
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
@@ -47,6 +47,7 @@ import com.team3.sneakx.ui.buyer.ListingDetailScreen
 import com.team3.sneakx.ui.buyer.OrderConfirmationScreen
 import com.team3.sneakx.ui.profile.ProfileScreen
 import com.team3.sneakx.ui.seller.ListingEditScreen
+import com.team3.sneakx.ui.components.SneakStartupLoading
 import com.team3.sneakx.ui.seller.MyListingsScreen
 import kotlinx.coroutines.flow.first
 
@@ -73,7 +74,7 @@ fun SneakRoot() {
 
     if (!startReady || startRoute == null) {
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            CircularProgressIndicator()
+            SneakStartupLoading()
         }
         return
     }
@@ -188,7 +189,9 @@ private fun BottomBar(
             Triple("profile", "Profile", Icons.Default.Person)
         )
     }
-    NavigationBar {
+    NavigationBar(
+        containerColor = MaterialTheme.colorScheme.surfaceContainer,
+    ) {
         items.forEach { (route, label, icon) ->
             val selected = currentRoute == route
             NavigationBarItem(
