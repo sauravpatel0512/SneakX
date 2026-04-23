@@ -1,5 +1,22 @@
 # SneakX (Android)
 
+# AUTHORS
+
+1.  Saurav Patel(1002265166)
+    Email: srp5166@mavs.uta.edu
+    Contact: +16825572475
+
+2.  Jignesha Bendale(1002214866)
+    Email: jxb4867@mavs.uta.edu
+
+3.  Ishika Sanghadia(1002133686)
+    Emial: ixs3686@mavs.uta.edu
+
+4.  Shishir Sunar(1002232718)
+    Emial: sxs2718@mavs.uta.edu
+
+# Defination    
+
 Shoe marketplace app for CSE 3310: Kotlin, Jetpack Compose, Room (SQLite), Material 3.
 
 ## Requirements
@@ -32,20 +49,7 @@ Change these in a production build; they are for local demo and testing only.
 - Admin: disable users, disable/remove listings; actions logged with timestamps.
 - Profile edit (unique email) and theme preference (system / light / dark).
 
-## GitHub
-
-Initialize a repository in this folder, add a remote, and push:
-
-```bash
-git init
-git add .
-git commit -m "Initial SneakX Android app"
-git branch -M main
-git remote add origin <your-repo-url>
-git push -u origin main
-```
 
 ## Project layout
 
 - `app/` — Android application module (`com.team3.sneakx`)
-- `SneakX_SRA_Document.md`, `CSE_3310_UML_Increment1_SneakX.md`, `SneakX_Test_Plan.md` — requirements and test traceability
