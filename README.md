@@ -1,19 +1,6 @@
 # SneakX (Android)
 
-# AUTHORS
 
-1.  Saurav Patel(1002265166)
-    Email: srp5166@mavs.uta.edu
-    Contact: +16825572475
-
-2.  Jignesha Bendale(1002214866)
-    Email: jxb4867@mavs.uta.edu
-
-3.  Ishika Sanghadia(1002133686)
-    Emial: ixs3686@mavs.uta.edu
-
-4.  Shishir Sunar(1002232718)
-    Emial: sxs2718@mavs.uta.edu
 
 # Defination    
 
